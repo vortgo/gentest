@@ -1,0 +1,5 @@
+services:
+
+  # Fixtures services
+  ShowcaseBundle\DataFixtures\ItemFixtures:
+    tags: [doctrine.fixture.orm]
