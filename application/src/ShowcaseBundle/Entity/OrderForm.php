@@ -7,14 +7,17 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Embedded;
 
 /**
- * Item
+ * OrderForm
  *
- * @ORM\Table(name="items")
- * @ORM\Entity(repositoryClass="ShowcaseBundle\Repository\ItemRepository")
+ * @ORM\Table(name="order_forms")
+ * @ORM\Entity(repositoryClass="ShowcaseBundle\Repository\OrderFormRepository")
  * @ORM\HasLifecycleCallbacks
  */
-class Item
+class OrderForm
 {
+    const STATUS_CREATED = 'created';
+    const STATUS_PROCESSING = 'processing';
+    const STATUS_SUCCESS = 'success';
     /**
      * @var int
      *
@@ -27,35 +30,14 @@ class Item
     /**
      * @var string
      *
-     * @ORM\Column(name="name", type="string", length=255)
+     * @ORM\Column(name="status", type="string", length=255)
      */
-    private $name;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="description", type="text", nullable=true)
-     */
-    private $description;
+    private $status;
 
     /**
      * @Embedded(class="Money")
      */
     private $price;
-
-    /**
-     * @var string
-     *
-     * @ORM\Column(name="image", type="string", length=255, nullable=true)
-     */
-    private $image;
-
-    /**
-     * @var int
-     *
-     * @ORM\Column(name="count", type="integer")
-     */
-    private $count;
 
     /**
      * @var datetime $createdAt
@@ -72,7 +54,7 @@ class Item
     private $updatedAt;
 
     /**
-     * @ORM\OneToMany(targetEntity="OrderFormItem", mappedBy="item", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="OrderFormItem", mappedBy="order_form", cascade={"persist"})
      */
     private $orderFormsItems;
 
@@ -81,6 +63,7 @@ class Item
      */
     public function __construct()
     {
+        $this->status = self::STATUS_CREATED;
         $this->orderFormsItems = new ArrayCollection();
     }
 
@@ -95,51 +78,27 @@ class Item
     }
 
     /**
-     * Set name
+     * Set status
      *
-     * @param string $name
+     * @param string $status
      *
-     * @return Item
+     * @return OrderForm
      */
-    public function setName($name)
+    public function setStatus($status)
     {
-        $this->name = $name;
+        $this->status = $status;
 
         return $this;
     }
 
     /**
-     * Get name
+     * Get status
      *
      * @return string
      */
-    public function getName()
+    public function getStatus()
     {
-        return $this->name;
-    }
-
-    /**
-     * Set description
-     *
-     * @param string $description
-     *
-     * @return Item
-     */
-    public function setDescription($description)
-    {
-        $this->description = $description;
-
-        return $this;
-    }
-
-    /**
-     * Get description
-     *
-     * @return string
-     */
-    public function getDescription()
-    {
-        return $this->description;
+        return $this->status;
     }
 
     /**
@@ -147,7 +106,7 @@ class Item
      *
      * @param Money $price
      *
-     * @return Item
+     * @return OrderForm
      */
     public function setPrice($price)
     {
@@ -167,77 +126,47 @@ class Item
     }
 
     /**
-     * Set image
+     * Get order form items
      *
-     * @param string $image
-     *
-     * @return Item
+     * @return array
      */
-    public function setImage($image)
-    {
-        $this->image = $image;
-
-        return $this;
-    }
-
-    /**
-     * Get image
-     *
-     * @return string
-     */
-    public function getImage()
-    {
-        return $this->image;
-    }
-
-    /**
-     * Set count
-     *
-     * @param integer $count
-     *
-     * @return Item
-     */
-    public function setCount($count)
-    {
-        $this->count = $count;
-
-        return $this;
-    }
-
-    /**
-     * Get count
-     *
-     * @return int
-     */
-    public function getCount()
-    {
-        return $this->count;
-    }
-
-    public function getOrderFormItem()
+    public function getOrderFormItems()
     {
         return $this->orderFormsItems->toArray();
     }
 
+    /**
+     * Add order form item
+     *
+     * @param OrderFormItem $orderFormsItem
+     * @return $this
+     */
     public function addOrderFormItem(OrderFormItem $orderFormsItem)
     {
         if (!$this->orderFormsItems->contains($orderFormsItem)) {
             $this->orderFormsItems->add($orderFormsItem);
-            $orderFormsItem->setItem($this);
+            $orderFormsItem->setOrderForm($this);
         }
 
         return $this;
     }
 
+    /**
+     * Remove order form item
+     *
+     * @param OrderFormItem $orderFormsItem
+     * @return $this
+     */
     public function removeOrderFormItem(OrderFormItem $orderFormsItem)
     {
         if ($this->orderFormsItems->contains($orderFormsItem)) {
             $this->orderFormsItems->removeElement($orderFormsItem);
-            $orderFormsItem->setItem(null);
+            $orderFormsItem->setOrderForm(null);
         }
 
         return $this;
     }
+
 
     /**
      * Gets triggered only on insert

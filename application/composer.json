@@ -4,7 +4,8 @@
   "type": "project",
   "autoload": {
     "psr-4": {
-      "ShowcaseBundle\\": "src/ShowcaseBundle"
+      "ShowcaseBundle\\": "src/ShowcaseBundle",
+      "PaymentBundle\\": "src/PaymentBundle"
     },
     "classmap": [
       "app/AppKernel.php",
@@ -27,6 +28,7 @@
     "incenteev/composer-parameter-handler": "^2.0",
     "sensio/distribution-bundle": "^5.0.19",
     "sensio/framework-extra-bundle": "^5.0.0",
+    "signedpay/api": "^1.1",
     "symfony/monolog-bundle": "^3.1.0",
     "symfony/polyfill-apcu": "^1.0",
     "symfony/swiftmailer-bundle": "^2.6.4",

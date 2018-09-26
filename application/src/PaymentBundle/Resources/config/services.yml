@@ -1,0 +1,10 @@
+parameters:
+  app.payment.merchant_id: '%payment_merchant_id%'
+  app.payment.private_key: '%payment_private_key%'
+  app.payment.api_endpoint: '%payment_api_endpoint%'
+
+services:
+  app.payment_service:
+    class: PaymentBundle\Services\PaymentService
+    arguments: ['%app.payment.merchant_id%', '%app.payment.private_key%', '%app.payment.api_endpoint%']
+

@@ -6,6 +6,7 @@ use Doctrine\Bundle\FixturesBundle\ORMFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 use Faker\Factory;
 use ShowcaseBundle\Entity\Item;
+use ShowcaseBundle\Entity\Money;
 
 class ItemFixtures implements ORMFixtureInterface
 {
@@ -33,7 +34,7 @@ class ItemFixtures implements ORMFixtureInterface
             $item->setName(ucfirst(implode(' ', $this->faker->words(3))));
             $item->setDescription($this->faker->realText(300));
             $item->setImage($this->faker->imageUrl());
-            $item->setPrice(mt_rand(10, 1000));
+            $item->setPrice(new Money(mt_rand(10, 1000), 'USD'));
             $item->setCount(mt_rand(1, 100));
             $manager->persist($item);
         }

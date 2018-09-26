@@ -3,3 +3,8 @@ services:
   # Fixtures services
   ShowcaseBundle\DataFixtures\ItemFixtures:
     tags: [doctrine.fixture.orm]
+
+  app.order_service:
+    class: ShowcaseBundle\Services\OrderService
+    arguments: ['@app.payment_service', '@doctrine.orm.default_entity_manager']
+
