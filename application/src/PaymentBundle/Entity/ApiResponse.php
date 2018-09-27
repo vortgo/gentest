@@ -12,16 +12,8 @@ namespace PaymentBundle\Entity;
 use PaymentBundle\Exceptions\ApiGetDataException;
 use PaymentBundle\Exceptions\ApiGetErrorsDataException;
 
-class ApiResponse
+class ApiResponse extends AbstractBaseResponse
 {
-    /** @var array */
-    private $data;
-
-    public function __construct(array $data)
-    {
-        $this->data = $data;
-    }
-
     public function isFailed()
     {
         if (isset($this->data['error']) && !empty($this->data)) {

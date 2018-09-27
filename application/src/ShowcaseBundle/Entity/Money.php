@@ -52,6 +52,16 @@ class Money
     }
 
     /**
+     * Get amount
+     *
+     * @return int
+     */
+    public function getAmountInPennies()
+    {
+        return (int)$this->amount * 100;
+    }
+
+    /**
      * Get currency
      *
      * @return string

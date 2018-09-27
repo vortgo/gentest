@@ -6,5 +6,5 @@ services:
 
   app.order_service:
     class: ShowcaseBundle\Services\OrderService
-    arguments: ['@app.payment_service', '@doctrine.orm.default_entity_manager']
+    arguments: ['@app.payment_service', '@doctrine', '@service_container']
 

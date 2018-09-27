@@ -16,8 +16,14 @@ use Doctrine\ORM\Mapping\Embedded;
 class OrderForm
 {
     const STATUS_CREATED = 'created';
+    const STATUS_PAYING = 'paying';
     const STATUS_PROCESSING = 'processing';
     const STATUS_SUCCESS = 'success';
+    const STATUS_FAIL = 'fail';
+
+    const TRANSITION_PAY = 'pay';
+    const TRANSITION_PAID = 'paid';
+
     /**
      * @var int
      *
@@ -54,9 +60,16 @@ class OrderForm
     private $updatedAt;
 
     /**
-     * @ORM\OneToMany(targetEntity="OrderFormItem", mappedBy="order_form", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="OrderFormItem", mappedBy="orderForm", cascade={"persist"})
      */
     private $orderFormsItems;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="pay_form_token", type="text",  nullable=true)
+     */
+    private $payFormToken;
 
     /**
      * OrderFormItem constructor.
@@ -177,7 +190,6 @@ class OrderForm
         $this->createdAt = new \DateTime("now");
     }
 
-
     /**
      * Gets triggered every time on update
      * @ORM\PreUpdate
@@ -185,6 +197,24 @@ class OrderForm
     public function onPreUpdate()
     {
         $this->updatedAt = new \DateTime("now");
+    }
+
+    /**
+     * @return string
+     */
+    public function getPayFormToken(): ?string
+    {
+        return $this->payFormToken;
+    }
+
+    /**
+     * @param string $payFormToken
+     * @return OrderForm
+     */
+    public function setPayFormToken(string $payFormToken): OrderForm
+    {
+        $this->payFormToken = $payFormToken;
+        return $this;
     }
 }
 

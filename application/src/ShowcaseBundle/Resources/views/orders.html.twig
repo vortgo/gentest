@@ -4,10 +4,32 @@
 
 {% block body %}
     <div class="row">
-        {% for order in orders %}
-            <div class="col-md-4">
-                {{ order.id }}
-            </div>
-        {% endfor %}
+
+        <div class="col-md-12">
+            <table class="table">
+                <thead class="thead-dark">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Price</th>
+                    <th scope="col">Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for order in orders %}
+                    <tr>
+                        <th scope="row">{{ order.id }}</th>
+                        <td>{{ order.getStatus() }}</td>
+                        <td>{{ order.price }}</td>
+                        <td>
+                            {% if workflow_can(order, 'pay') %}
+                                <a href="{{ path('pay_form', {'order': order.id}) }}" class="btn btn-primary">pay</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 {% endblock %}

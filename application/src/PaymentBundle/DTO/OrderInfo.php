@@ -32,7 +32,7 @@ class OrderInfo extends BaseDTO
      * @param int $amount
      * @return OrderInfo
      */
-    public function setAmount(int $amount): OrderInfo
+    public function setAmount(float $amount): OrderInfo
     {
         $this->amount = $amount;
         return $this;

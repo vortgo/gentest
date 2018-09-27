@@ -8,9 +8,9 @@ use Doctrine\ORM\Mapping as ORM;
  * Cards
  *
  * @ORM\Table(name="cards")
- * @ORM\Entity(repositoryClass="ShowcaseBundle\Repository\CardsRepository")
+ * @ORM\Entity(repositoryClass="ShowcaseBundle\Repository\CardRepository")
  */
-class Cards
+class Card
 {
     /**
      * @var int
@@ -72,7 +72,7 @@ class Cards
      *
      * @param string $token
      *
-     * @return Cards
+     * @return Card
      */
     public function setToken($token)
     {
@@ -96,7 +96,7 @@ class Cards
      *
      * @param string $bank
      *
-     * @return Cards
+     * @return Card
      */
     public function setBank($bank)
     {
@@ -120,7 +120,7 @@ class Cards
      *
      * @param string $brand
      *
-     * @return Cards
+     * @return Card
      */
     public function setBrand($brand)
     {
@@ -144,7 +144,7 @@ class Cards
      *
      * @param string $country
      *
-     * @return Cards
+     * @return Card
      */
     public function setCountry($country)
     {
@@ -168,7 +168,7 @@ class Cards
      *
      * @param string $number
      *
-     * @return Cards
+     * @return Card
      */
     public function setNumber($number)
     {
@@ -185,6 +185,14 @@ class Cards
     public function getNumber()
     {
         return $this->number;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCardName()
+    {
+        return $this->getBrand() . ' - ' . $this->getNumber();
     }
 }
 

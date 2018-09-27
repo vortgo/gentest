@@ -106,7 +106,7 @@ class OrderFormItem
     }
 
     /**
-     * @return mixed
+     * @return Item
      */
     public function getItem()
     {

@@ -42,15 +42,28 @@ framework:
       - ShowcaseBundle\Entity\OrderForm
       places:
       - created
+      - paying
       - processing
-      - successed
+      - success
+      - fail
       - canceled
       - declined
       - refunded
       transitions:
         pay:
           from: created
+          to: paying
+        precessing:
+          from: paying
           to: processing
+        success:
+          from:
+          - paying
+          - processing
+          to: success
+        fail:
+          from: paying
+          to: fail
 
 
 # Twig Configuration
