@@ -20,10 +20,13 @@ class OrderForm
     const STATUS_PROCESSING = 'processing';
     const STATUS_SUCCESS = 'success';
     const STATUS_FAIL = 'fail';
+    const STATUS_REFUNDING = 'refunding';
+    const STATUS_REFUNDED = 'refunded';
 
     const TRANSITION_PAY = 'pay';
-    const TRANSITION_PAID = 'paid';
     const TRANSITION_PROCESSING = 'precessing';
+    const TRANSITION_REFUNDING = 'refunding';
+    const TRANSITION_REFUNDED = 'refunded';
 
     /**
      * @var int

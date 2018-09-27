@@ -39,6 +39,9 @@
                                     </div>
                                 {% endif %}
                             {% endif %}
+                            {% if workflow_can(order, 'refunding') %}
+                                <a href="{{ path('refund', {'order': order.id}) }}" class="btn btn-warning">Refund</a>
+                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %}

@@ -14,6 +14,11 @@ abstract class AbstractBaseResponse
     /** @var array */
     protected $data;
 
+    /**
+     * AbstractBaseResponse constructor.
+     *
+     * @param array $data
+     */
     public function __construct(array $data)
     {
         $this->data = $data;

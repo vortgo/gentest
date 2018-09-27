@@ -35,13 +35,13 @@ class CallbackResponse extends AbstractBaseResponse
      */
     public function getCard()
     {
+        $card = new Card();
         if (isset($this->data['transaction']['card'])) {
-            $card = new Card();
             $card->fillFromArray($this->data['transaction']['card']);
             $card->setToken($this->data['transaction']['card']['card_token']['token'] ?? null);
             return $card;
         }
-        throw new ApiGetDataException('Response does not have a card section');
+        return $card;
     }
 
     /**
@@ -52,6 +52,18 @@ class CallbackResponse extends AbstractBaseResponse
     {
         if (isset($this->data['transaction']['status'])) {
             return $this->data['transaction']['status'];
+        }
+        throw new ApiGetDataException('Invalid response');
+    }
+
+    /**
+     * @return string
+     * @throws ApiGetDataException
+     */
+    public function getPaymentOperation()
+    {
+        if (isset($this->data['transaction']['operation'])) {
+            return $this->data['transaction']['operation'];
         }
         throw new ApiGetDataException('Invalid response');
     }

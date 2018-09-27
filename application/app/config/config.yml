@@ -46,8 +46,7 @@ framework:
       - processing
       - success
       - fail
-      - canceled
-      - declined
+      - refunding
       - refunded
       transitions:
         pay:
@@ -56,6 +55,12 @@ framework:
         precessing:
           from: paying
           to: processing
+        refunding:
+          from: success
+          to: refunding
+        refunded:
+          from: refunding
+          to: refunded
         success:
           from:
           - paying

@@ -11,6 +11,12 @@ namespace PaymentBundle\DTO;
 
 abstract class BaseDTO
 {
+    /**
+     * Transform data to array
+     *
+     * @return array
+     * @throws \ReflectionException
+     */
     public function toArray()
     {
         $data = [];
@@ -23,6 +29,13 @@ abstract class BaseDTO
         return $data;
     }
 
+    /**
+     * Get array witch included only selected keys
+     *
+     * @param array $keys
+     * @return array
+     * @throws \ReflectionException
+     */
     public function only(array $keys)
     {
         $data = $this->toArray();
@@ -31,6 +44,13 @@ abstract class BaseDTO
         }, ARRAY_FILTER_USE_KEY);
     }
 
+    /**
+     * Get array witch included all keys except selected
+     *
+     * @param array $keys
+     * @return array
+     * @throws \ReflectionException
+     */
     public function except(array $keys)
     {
         $data = $this->toArray();
@@ -39,6 +59,12 @@ abstract class BaseDTO
         }, ARRAY_FILTER_USE_KEY);
     }
 
+    /**
+     * Get getter method name by property
+     *
+     * @param string $property
+     * @return string
+     */
     private function getNameOfGetter(string $property)
     {
         return 'get' . str_replace('_', '', ucwords($property, '_'));

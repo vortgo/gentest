@@ -16,6 +16,7 @@ use PaymentBundle\Entity\ApiResponse;
 use PaymentBundle\Entity\CallbackResponse;
 use PaymentBundle\Exceptions\PaymentErrorOccurredException;
 use PaymentBundle\Exceptions\PaymentRecurringException;
+use PaymentBundle\Exceptions\PaymentRefundingException;
 use PaymentBundle\Exceptions\PaymentTokenFormException;
 use Signedpay\API\Api;
 
@@ -62,11 +63,27 @@ class PaymentService
         return $apiResponse->getFormToken();
     }
 
+    /**
+     * Make form url
+     *
+     * @param string $token
+     * @return string
+     */
     public function makeFormUrlFromToken(string $token)
     {
         return $this->apiEndpoint . 'purchase/' . $token;
     }
 
+    /**
+     * Do recurring
+     *
+     * @param UserInfo $userInfo
+     * @param OrderInfo $orderInfo
+     * @param CardInfo $cardInfo
+     * @return ApiResponse
+     * @throws PaymentRecurringException
+     * @throws \ReflectionException
+     */
     public function recurring(UserInfo $userInfo, OrderInfo $orderInfo, CardInfo $cardInfo)
     {
         $payload = array_merge($userInfo->toArray(), $orderInfo->toArray(), $cardInfo->toArray(), ['callback_url' => $this->paymentCallback]);
@@ -78,11 +95,45 @@ class PaymentService
         return $this->makeResponse($responseData);
     }
 
+    /**
+     * Do refund
+     *
+     * @param OrderInfo $orderInfo
+     * @return ApiResponse
+     * @throws PaymentRefundingException
+     * @throws \ReflectionException
+     */
+    public function refund(OrderInfo $orderInfo)
+    {
+        $payload = array_merge($orderInfo->toArray(), ['callback_url' => $this->paymentCallback]);
+        try {
+            $responseData = $this->api->refund($payload);
+        } catch (\Exception $apiException) {
+            throw new PaymentRefundingException('Refund failed');
+        }
+        return $this->makeResponse($responseData);
+    }
+
+    /**
+     * Make callback response
+     *
+     * @param array $data
+     * @return CallbackResponse
+     */
     public function processCallback(array $data)
     {
         return new CallbackResponse($data);
     }
 
+    /**
+     * Initialize payment for payment form
+     *
+     * @param UserInfo $userInfo
+     * @param OrderInfo $orderInfo
+     * @return ApiResponse
+     * @throws PaymentTokenFormException
+     * @throws \ReflectionException
+     */
     private function initPayment(UserInfo $userInfo, OrderInfo $orderInfo)
     {
         $payload = array_merge($userInfo->toArray(), $orderInfo->toArray(), ['callback_url' => $this->paymentCallback]);
@@ -94,6 +145,12 @@ class PaymentService
         return $this->makeResponse($responseData);
     }
 
+    /**
+     * Make response
+     *
+     * @param array $data
+     * @return ApiResponse
+     */
     private function makeResponse(array $data)
     {
         return new ApiResponse($data);

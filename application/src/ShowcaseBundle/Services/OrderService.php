@@ -81,12 +81,20 @@ class OrderService
         return $order;
     }
 
+    /**
+     * Process payment data and update order
+     *
+     * @param array $data
+     * @throws NotFoundOrderException
+     * @throws \PaymentBundle\Exceptions\ApiGetDataException
+     */
     public function updatePayData(array $data)
     {
         $callbackResponse = $this->paymentService->processCallback($data);
         $orderResponse = $callbackResponse->getOrder();
         $cardResponse = $callbackResponse->getCard();
         $paymentStatus = $callbackResponse->getPaymentStatus();
+        $paymentOperation = $callbackResponse->getPaymentOperation();
 
         /** @var OrderForm $order */
         $order = $this->doctrine->getRepository(OrderForm::class)->find($orderResponse->getOrderId());
@@ -96,9 +104,14 @@ class OrderService
 
         /** @var StateMachine $stateMachine */
         $stateMachine = $this->serviceContainer->get('state_machine.order_form');
-        if ($stateMachine->can($order, $paymentStatus)) {
-            $order->setStatus($paymentStatus);
-            if ($order->getStatus() == OrderForm::STATUS_FAIL) {
+        if ($stateMachine->can($order, $this->getTransition($paymentStatus, $paymentOperation))) {
+            if ($paymentOperation == 'refund' && $paymentStatus == OrderForm::STATUS_SUCCESS) {
+                $order->setStatus(OrderForm::STATUS_REFUNDED);
+            } else {
+                $order->setStatus($paymentStatus);
+            }
+
+            if ($this->isNeedReturnItems($order)) {
                 $this->returnItems($order);
             }
         }
@@ -111,6 +124,38 @@ class OrderService
         }
     }
 
+    /**
+     * Check is need to return items
+     *
+     * @param OrderForm $order
+     * @return bool
+     */
+    private function isNeedReturnItems(OrderForm $order)
+    {
+        return in_array($order->getStatus(), [OrderForm::STATUS_FAIL, OrderForm::STATUS_REFUNDED]);
+    }
+
+    /**
+     * Get transitions for order
+     *
+     * @param $paymentStatus
+     * @param $paymentOperation
+     * @return string
+     */
+    private function getTransition($paymentStatus, $paymentOperation)
+    {
+        if ($paymentOperation == 'refund' && $paymentStatus == OrderForm::STATUS_SUCCESS) {
+            return OrderForm::TRANSITION_REFUNDED;
+        } else {
+            return $paymentStatus;
+        }
+    }
+
+    /**
+     * Return items if order was failed or refunded
+     *
+     * @param OrderForm $order
+     */
     public function returnItems(OrderForm $order)
     {
         $orderFormItems = $order->getOrderFormItems();
@@ -123,6 +168,11 @@ class OrderService
         $this->doctrine->getManager()->flush();
     }
 
+    /**
+     * Store user's card
+     *
+     * @param Card $card
+     */
     private function storeCard(Card $card)
     {
         $usersCards = $this->doctrine->getRepository(UsersCard::class)->findBy([
@@ -144,6 +194,16 @@ class OrderService
         }
     }
 
+    /**
+     * Recurring
+     *
+     * @param UsersCard $card
+     * @param OrderForm $order
+     * @throws NotFoundOrderException
+     * @throws \PaymentBundle\Exceptions\ApiGetDataException
+     * @throws \PaymentBundle\Exceptions\PaymentRecurringException
+     * @throws \ReflectionException
+     */
     public function payRecurringOrder(UsersCard $card, OrderForm $order)
     {
         $userInfo = new UserInfo();
@@ -165,6 +225,31 @@ class OrderService
         /** @var StateMachine $stateMachine */
         $stateMachine = $this->serviceContainer->get('state_machine.order_form');
         $stateMachine->apply($order, 'pay');
+
+        $this->updatePayData($apiResponse->getData());
+    }
+
+    /**
+     * Refund order
+     *
+     * @param OrderForm $order
+     * @throws NotFoundOrderException
+     * @throws \PaymentBundle\Exceptions\ApiGetDataException
+     * @throws \PaymentBundle\Exceptions\PaymentRefundingException
+     * @throws \ReflectionException
+     */
+    public function refundOrder(OrderForm $order)
+    {
+        $orderInfo = new OrderInfo();
+        $orderInfo->setAmount($order->getPrice()->getAmountInPennies() - 1)
+            ->setCurrency($order->getPrice()->getCurrency())
+            ->setOrderDescription('desc')
+            ->setOrderId($order->getId());
+
+        $apiResponse = $this->paymentService->refund($orderInfo);
+        /** @var StateMachine $stateMachine */
+        $stateMachine = $this->serviceContainer->get('state_machine.order_form');
+        $stateMachine->apply($order, OrderForm::TRANSITION_REFUNDING);
 
         $this->updatePayData($apiResponse->getData());
     }
@@ -218,7 +303,7 @@ class OrderService
 
             /** @var StateMachine $stateMachine */
             $stateMachine = $this->serviceContainer->get('state_machine.order_form');
-            $stateMachine->apply($order, 'pay');
+            $stateMachine->apply($order, OrderForm::TRANSITION_PAY);
 
             $this->doctrine->getManager()->persist($order);
             $this->doctrine->getManager()->flush();

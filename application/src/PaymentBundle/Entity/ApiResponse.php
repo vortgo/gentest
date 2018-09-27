@@ -14,6 +14,10 @@ use PaymentBundle\Exceptions\ApiGetErrorsDataException;
 
 class ApiResponse extends AbstractBaseResponse
 {
+    /**
+     * Check is failed response
+     * @return bool
+     */
     public function isFailed()
     {
         if (isset($this->data['error']) && !empty($this->data)) {
@@ -23,6 +27,12 @@ class ApiResponse extends AbstractBaseResponse
         return false;
     }
 
+    /**
+     * Get error from response
+     *
+     * @return mixed
+     * @throws ApiGetErrorsDataException
+     */
     public function getErrors()
     {
         if (!isset($this->data['error']['messages'])) {
@@ -31,6 +41,12 @@ class ApiResponse extends AbstractBaseResponse
         return $this->data['error']['messages'];
     }
 
+    /**
+     * Get errors code
+     *
+     * @return mixed
+     * @throws ApiGetErrorsDataException
+     */
     public function getErrorCode()
     {
         if (!isset($this->data['error']['code'])) {
@@ -39,6 +55,12 @@ class ApiResponse extends AbstractBaseResponse
         return $this->data['error']['code'];
     }
 
+    /**
+     * Get form token
+     *
+     * @return mixed
+     * @throws ApiGetDataException
+     */
     public function getFormToken()
     {
         if (!isset($this->data['pay_form']['token'])) {

@@ -94,18 +94,40 @@ class ShowcaseController extends Controller
     }
 
     /**
+     * @Route("/order/{order}/refund", methods={"GET"}, name="refund")
+     */
+    public function orderRefundAction($order)
+    {
+        /** @var OrderForm $orderForm */
+        $orderForm = $this->getDoctrine()->getRepository(OrderForm::class)->findOneBy([
+            'id' => $order,
+            'status' => OrderForm::STATUS_SUCCESS
+        ]);
+
+        if (!$orderForm) {
+            return new Response('', 404);
+        }
+
+        /** @var OrderService $orderService */
+        $orderService = $this->container->get('app.order_service');
+        $orderService->refundOrder($orderForm);
+        return $this->redirectToRoute('orders_list');
+    }
+
+    /**
      * @Route("/payment/callback")
      */
     public function paymentCallbackAction(Request $request)
     {
-        /** @var OrderService $orderService */
-        $orderService = $this->container->get('app.order_service');
-        $orderService->updatePayData(json_decode($request->getContent(), true));
-        return new Response('ok');
-
+        try {
+            /** @var OrderService $orderService */
+            $orderService = $this->container->get('app.order_service');
+            $orderService->updatePayData(json_decode($request->getContent(), true));
+            return new Response('ok');
+        } catch (\Exception $e) {
+            return new Response($e->getMessage(), 500);
+        }
     }
-
-
 }
 
 
