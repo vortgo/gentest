@@ -1,6 +1,6 @@
-#Test task for Genesis company
+# Test task for Genesis company
 
-###For deploy use next commands:
+### For deploy use next commands:
 Start docker
 ```
     $ cd docker && docker-compose up -d
@@ -19,8 +19,3 @@ Setup DB
 Setup app: setup `app/config/parameters.yml`
 
 Open `http://localhost`
-
-
-
-
-
