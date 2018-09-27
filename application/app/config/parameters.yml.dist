@@ -2,18 +2,19 @@
 # Set parameters here that may be different on each deployment target of the app, e.g. development, staging, production.
 # https://symfony.com/doc/current/best_practices/configuration.html#infrastructure-related-configuration
 parameters:
-    database_host: 127.0.0.1
-    database_port: ~
-    database_name: symfony
-    database_user: root
-    database_password: ~
-    # You should uncomment this if you want to use pdo_sqlite
-    #database_path: '%kernel.project_dir%/var/data/data.sqlite'
+        database_host: postgres
+        database_port: 5432
+        database_name: gentest
+        database_user: genuser
+        database_password: genpass
+        mailer_transport: smtp
+        mailer_host: 127.0.0.1
+        mailer_user: null
+        mailer_password: null
+        secret: 6e762ee916995ab73ad4468d4fbca96683e5a4bf
 
-    mailer_transport: smtp
-    mailer_host: 127.0.0.1
-    mailer_user: ~
-    mailer_password: ~
+        payment_merchant_id: unicorn
+        payment_private_key: 02e2a839-4e5e-43f6-b889-25d154f458cf
+        payment_api_endpoint: https://pay.sp-stage.us/api/v1/
+        payment_callback_url: https://fuzzy-earwig-34.localtunnel.me/payment/callback
 
-    # A secret key that's used to generate certain security-related tokens
-    secret: ThisTokenIsNotSoSecretChangeIt
