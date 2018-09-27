@@ -46,4 +46,12 @@ class ApiResponse extends AbstractBaseResponse
         }
         return $this->data['pay_form']['token'];
     }
+
+    /**
+     * @return array
+     */
+    public function getData(): array
+    {
+        return $this->data;
+    }
 }

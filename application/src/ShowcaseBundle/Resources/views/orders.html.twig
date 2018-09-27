@@ -23,7 +23,21 @@
                         <td>{{ order.price }}</td>
                         <td>
                             {% if workflow_can(order, 'pay') %}
-                                <a href="{{ path('pay_form', {'order': order.id}) }}" class="btn btn-primary">pay</a>
+                                <a href="{{ path('pay_form', {'order': order.id}) }}" class="btn btn-primary">Pay</a>
+                                {% if usersCards %}
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-primary dropdown-toggle"
+                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Pay with stored card
+                                        </button>
+                                        <div class="dropdown-menu">
+                                            {% for usersCard in usersCards %}
+                                                <a class="dropdown-item"
+                                                   href="{{ path('pay_recurring', {'order': order.id, 'card': usersCard.id}) }}">{{ usersCard.getCardName() }}</a>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% endif %}
                             {% endif %}
                         </td>
                     </tr>

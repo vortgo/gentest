@@ -69,7 +69,7 @@ class PaymentService
 
     public function recurring(UserInfo $userInfo, OrderInfo $orderInfo, CardInfo $cardInfo)
     {
-        $payload = array_merge((array)$userInfo, (array)$orderInfo, (array)$cardInfo);
+        $payload = array_merge($userInfo->toArray(), $orderInfo->toArray(), $cardInfo->toArray(), ['callback_url' => $this->paymentCallback]);
         try {
             $responseData = $this->api->recurring($payload);
         } catch (\Exception $apiException) {

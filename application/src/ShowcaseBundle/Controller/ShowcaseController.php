@@ -54,7 +54,7 @@ class ShowcaseController extends Controller
     {
         $orders = $this->getDoctrine()->getRepository(OrderForm::class)->findBy([], ['id' => 'DESC']);
         $usersCards = $this->getDoctrine()->getRepository(Card::class)->findBy([], ['id' => 'DESC']);
-        return $this->render('@Showcase/orders.html.twig', compact('orders'));
+        return $this->render('@Showcase/orders.html.twig', compact('orders', 'usersCards'));
     }
 
     /**
@@ -75,12 +75,22 @@ class ShowcaseController extends Controller
     }
 
     /**
-     * @Route("/order/{order}/pay", methods={"POST"})
+     * @Route("/order/{order}/recurring/{card}", methods={"GET"}, name="pay_recurring")
      */
-    public function orderPaidAction(Request $request)
+    public function orderPayRecurringAction($order, $card)
     {
-        dump($request);
-        die;
+        /** @var OrderForm $orderForm */
+        $orderForm = $this->getDoctrine()->getRepository(OrderForm::class)->find($order);
+        /** @var Card $card */
+        $card = $this->getDoctrine()->getRepository(Card::class)->find($card);
+        if (!$orderForm || !$card) {
+            return new Response('', 404);
+        }
+
+        /** @var OrderService $orderService */
+        $orderService = $this->container->get('app.order_service');
+        $orderService->payRecurringOrder($card, $orderForm);
+        return $this->redirectToRoute('orders_list');
     }
 
     /**

@@ -11,6 +11,7 @@ namespace ShowcaseBundle\Services;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Common\Persistence\ObjectManager;
+use PaymentBundle\DTO\CardInfo;
 use PaymentBundle\DTO\OrderInfo;
 use PaymentBundle\DTO\UserInfo;
 use PaymentBundle\Entity\ResponseEntities\Order;
@@ -141,6 +142,31 @@ class OrderService
             $this->doctrine->getManager()->persist($usersCard);
             $this->doctrine->getManager()->flush();
         }
+    }
+
+    public function payRecurringOrder(UsersCard $card, OrderForm $order)
+    {
+        $userInfo = new UserInfo();
+        $userInfo->setCustomerEmail('email@sdf.ru')
+            ->setGeoCountry('GBR')
+            ->setIpAddress('8.8.8.8');
+
+        $orderInfo = new OrderInfo();
+        $orderInfo->setAmount($order->getPrice()->getAmountInPennies())
+            ->setCurrency($order->getPrice()->getCurrency())
+            ->setOrderDescription('desc')
+            ->setOrderId($order->getId());
+
+        $cardInfo = new CardInfo();
+        $cardInfo->setRecurringToken($card->getToken());
+
+        $apiResponse = $this->paymentService->recurring($userInfo, $orderInfo, $cardInfo);
+
+        /** @var StateMachine $stateMachine */
+        $stateMachine = $this->serviceContainer->get('state_machine.order_form');
+        $stateMachine->apply($order, 'pay');
+
+        $this->updatePayData($apiResponse->getData());
     }
 
     /**

@@ -23,6 +23,7 @@ class OrderForm
 
     const TRANSITION_PAY = 'pay';
     const TRANSITION_PAID = 'paid';
+    const TRANSITION_PROCESSING = 'precessing';
 
     /**
      * @var int
