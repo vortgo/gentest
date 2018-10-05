@@ -1,4 +1,4 @@
-# Test task for Genesis company
+# Test task
 
 ### For deploy use next commands:
 Start docker
